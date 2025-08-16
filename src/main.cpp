@@ -7,7 +7,7 @@
 #define WIDTH 200
 #define HEIGHT 200
 #define MULTIPLIER 3
-#define DIFFICULTY 10
+#define DIFFICULTY 20
 
 TTF_Font *font;
 SDL_Texture *digitTextures[10];
@@ -141,7 +141,7 @@ int main(int argv, char **argc)
         std::cout << "Failed to initialize SDL TTF: " << SDL_GetError() << std::endl;
     }
 
-    font = TTF_OpenFont("assets/OpenSans.ttf", 20);
+    font = TTF_OpenFont("assets/OpenSans.ttf", 10*MULTIPLIER);
 
     SDL_Window *window = SDL_CreateWindow(
         "LANsweeper",
@@ -170,10 +170,13 @@ int main(int argv, char **argc)
     SDL_RenderClear(renderer);
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+    int rectW, rectH;
+
     for (int i = 0; i < 9; i++)
     {
         char currDigit[2] = {(i == 0 ? '\0' : (char)('0' + i)), '\0'};
         digitTextures[i] = generate_digit_texture(currDigit, renderer);
+        TTF_SizeText(font, currDigit, &rectW, &rectH);
         std::cout << "Generated for:" << (char)('0' + i) << std::endl;
     }
 
@@ -211,12 +214,12 @@ int main(int argv, char **argc)
                 // std::cout << x1 << " " << y1 << std::endl;
                 SDL_RenderDrawLine(renderer, x1, y1, x1 + dx, y1 + dy);
             } else {
-                SDL_Rect rect = {x1, y1, dx, dy};
+                SDL_Rect rect = {(x1+ x1 + dx)/2 - (rectW/2), (y1 + y1 + dy)/2 - (rectH/2), rectW, rectH};
                 SDL_RenderCopy(renderer, digitTextures[board[i][j] - '0'], NULL, &rect);
             }
         }
     }
-
+    
     SDL_RenderPresent(renderer);
     int mousex, mousey;
     bool running = true;
